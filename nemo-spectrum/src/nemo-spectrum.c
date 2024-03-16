@@ -153,7 +153,7 @@ nemo_spectrum_info_update_file_info(NemoInfoProvider     *provider,
     
     get_gfile_and_gfileinfo_from_nemofileinfo (file, &gfile, &ginfo);
     sort_order_string = get_currently_applied_sort_order (ginfo);
-    nemo_file_info_add_string_attribute (info, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
+    nemo_file_info_add_string_attribute (file, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
     return NEMO_OPERATION_COMPLETE;
 }
 
@@ -180,6 +180,42 @@ static void nemo_spectrum_info_init_hook(GTypeModule* module, GType spectrum_typ
         spectrum_type,
         NEMO_TYPE_INFO_PROVIDER,
         &info_provider_iface_info
+    );
+}
+
+//====================================================================================================================//
+// nemo-column-provider.h //==========================================================================================//
+//====================================================================================================================//
+#include <libnemo-extension/nemo-column-provider.h>
+
+static GList* nemo_spectrum_column_get_columns(NemoColumnProvider* provider) {
+    GList* ret = NULL;
+    NemoColumn *column = nemo_column_new (
+        "NemoSpectrum::sort_order_column",
+        NEMO_METADATA_NEMO_SORT_ORDER,
+        "Sort Order", // TODO _()
+        ""
+    );
+
+    ret = g_list_append(ret, column);
+    return ret;
+}
+
+static void nemo_spectrum_column_provider_iface_init(NemoColumnProviderIface *iface) {
+    iface->get_columns = nemo_spectrum_column_get_columns;
+}
+
+static void nemo_spectrum_column_init_hook(GTypeModule* module, GType spectrum_type) {
+    static const GInterfaceInfo column_provider_iface_info = {
+        (GInterfaceInitFunc) nemo_spectrum_column_provider_iface_init,
+        NULL,
+        NULL
+    };
+    g_type_module_add_interface(
+        module,
+        spectrum_type,
+        NEMO_TYPE_COLUMN_PROVIDER,
+        &column_provider_iface_info
     );
 }
 
@@ -229,42 +265,6 @@ static void nemo_spectrum_property_page_init_hook(GTypeModule* module, GType spe
         spectrum_type,
         NEMO_TYPE_PROPERTY_PAGE_PROVIDER,
         &property_page_provider_iface_info
-    );
-}
-
-//====================================================================================================================//
-// nemo-column-provider.h //==========================================================================================//
-//====================================================================================================================//
-#include <libnemo-extension/nemo-column-provider.h>
-
-static GList* nemo_spectrum_column_get_columns(NemoColumnProvider* provider) {
-    GList* ret = NULL;
-    NemoColumn *column = nemo_column_new (
-        "NemoSpectrum::sort_order_column",
-        NEMO_METADATA_NEMO_SORT_ORDER,
-        "Sort Order", // TODO _()
-        ""
-    );
-
-    ret = g_list_append(ret, column);
-    return ret;
-}
-
-static void nemo_spectrum_column_provider_iface_init(NemoColumnProviderIface *iface) {
-    iface->get_columns = nemo_spectrum_column_get_columns;
-}
-
-static void nemo_spectrum_column_init_hook(GTypeModule* module, GType spectrum_type) {
-    static const GInterfaceInfo column_provider_iface_info = {
-        (GInterfaceInitFunc) nemo_spectrum_column_provider_iface_init,
-        NULL,
-        NULL
-    };
-    g_type_module_add_interface(
-        module,
-        spectrum_type,
-        NEMO_TYPE_COLUMN_PROVIDER,
-        &column_provider_iface_info
     );
 }
 
@@ -342,6 +342,7 @@ static void nemo_spectrum_register_type(GTypeModule* module) {
     // Add init hooks here
 
     nemo_spectrum_info_init_hook(module, spectrum_type);
+    nemo_spectrum_column_hook(module, spectrum_type);
     nemo_spectrum_property_page_init_hook(module, spectrum_type);
     nemo_spectrum_name_and_desc_init_hook(module, spectrum_type);
 }
