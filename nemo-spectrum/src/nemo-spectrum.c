@@ -29,6 +29,8 @@
 #endif
 
 #include "nemo-spectrum.h"
+#include <gtk/gtk.h>
+#include <libnemo-extension/nemo-file-info.h>
 
 //====================================================================================================================//
 // Global and static variables //=====================================================================================//
@@ -40,7 +42,7 @@ typedef struct {
 
     GtkWidget *entry_sort_order;
     GtkWidget *button_cancel;
-    GtkWidget *button_apply
+    GtkWidget *button_apply;
     GtkWidget *button_information;
 } SpectrumWindow;
 
@@ -59,18 +61,24 @@ create_window (NemoFileInfo *info)
 
     window = g_new0 (SpectrumWindow, 1);
     window->xml = gtk_builder_new ();
-    gtk_builder_set_translation_domain (xml, "nemo-extensions");
+    gtk_builder_set_translation_domain (window->xml, "nemo-extensions");
+
     error = NULL;
-    g_assert (gtk_builder_add_from_file (xml, INTERFACES_DIR"/spectrum.glade", &error));
-    window->root = GTK_WIDGET (gtk_builder_get_object (xml, "root"));
+    gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error)
+    if (error != NULL)
+    {
+    	fprintf (stderr, "Error: %s", error->message);
+    	g_assert (false);
+    }
+    window->root = GTK_WIDGET (gtk_builder_get_object (window->xml, "root"));
 
     sort_order_string = nemo_file_info_get_string_attribute (info, NEMO_METADATA_NEMO_SORT_ORDER);
-    window->entry_sort_order = GTK_WIDGET (gtk_builder_get_object (xml, "entry_sort_order"));
-    gtk_entry_set_text (GTK_ENTRY (entry_sort_order), sort_order_string);
+    window->entry_sort_order = GTK_WIDGET (gtk_builder_get_object (window->xml, "entry_sort_order"));
+    gtk_entry_set_text (GTK_ENTRY (window->entry_sort_order), sort_order_string);
 
-    window->button_cancel = GTK_WIDGET (gtk_builder_get_object (xml, "button_cancel"));
-    window->button_apply = GTK_WIDGET (gtk_builder_get_object (xml, "button_apply"));
-    window->button_information = GTK_WIDGET (gtk_builder_get_object (xml, "button_information"));
+    window->button_cancel = GTK_WIDGET (gtk_builder_get_object (window->xml, "button_cancel"));
+    window->button_apply = GTK_WIDGET (gtk_builder_get_object (window->xml, "button_apply"));
+    window->button_information = GTK_WIDGET (gtk_builder_get_object (window->xml, "button_information"));
 
     return window;
 }
@@ -95,7 +103,7 @@ nemo_spectrum_info_cancel_update(NemoInfoProvider    *provider,
                                  NemoOperationHandle *handle)
 {
     // TODO
-    handle->cancelled = TRUE;
+    //handle->cancelled = TRUE;
 }
 
 static void nemo_spectrum_info_provider_iface_init(NemoInfoProviderIface *iface) {
@@ -124,7 +132,7 @@ static void nemo_spectrum_info_init_hook(GTypeModule* module, GType spectrum_typ
 
 static GList* nemo_spectrum_property_page_get_pages(NemoPropertyPageProvider* provider, GList* files) {
     NemoFileInfo *fileinfo;
-    SpectrumWindow *window
+    SpectrumWindow *window;
     GList *pages;
     NemoPropertyPage *page;
 
@@ -141,7 +149,7 @@ static GList* nemo_spectrum_property_page_get_pages(NemoPropertyPageProvider* pr
     page = nemo_property_page_new(
         "NemoSpectrum::property_page",
         gtk_label_new("Sort Order"), // TODO _()
-        page->root
+        window->root
     );
     pages = g_list_append(pages, page);
 
@@ -256,7 +264,7 @@ void nemo_module_shutdown(void) {
 
 void nemo_module_list_types(const GType** types, int* num_types) {
     static GType type_list[1];
-    type_list[0] = NEMO_TYPE_SPECTRUM
+    type_list[0] = NEMO_TYPE_SPECTRUM;
     *types = type_list;
     *num_types = 1;
 }
