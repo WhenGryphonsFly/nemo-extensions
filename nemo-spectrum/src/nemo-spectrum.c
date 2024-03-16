@@ -342,7 +342,7 @@ static void nemo_spectrum_register_type(GTypeModule* module) {
     // Add init hooks here
 
     nemo_spectrum_info_init_hook(module, spectrum_type);
-    nemo_spectrum_column_hook(module, spectrum_type);
+    nemo_spectrum_column_init_hook(module, spectrum_type);
     nemo_spectrum_property_page_init_hook(module, spectrum_type);
     nemo_spectrum_name_and_desc_init_hook(module, spectrum_type);
 }
