@@ -37,7 +37,7 @@
 //====================================================================================================================//
 
 typedef struct {
-    NemoFileInfo *info;
+    GFileInfo *ginfo;
     GtkBuilder *xml;
     GtkWidget *root;
 
@@ -48,20 +48,48 @@ typedef struct {
 } SpectrumWindow;
 
 //====================================================================================================================//
-// Static functions //================================================================================================//
+// Shared functions //================================================================================================//
 //====================================================================================================================//
+#define NEMO_METADATA_NEMO_SORT_ORDER "metadata::nemo-sort-order"
 
-#define NEMO_METADATA_NEMO_SORT_ORDER "nemo-sort-order"
+static GFileInfo *
+get_gfileinfo_from_nemofileinfo (NemoFileInfo *info)
+{
+    GFile *file
+    GFileInfo *ginfo;
+    GError *error;
+
+    error = NULL;
+    file = nemo_file_info_get_location (info);
+    ginfo = g_file_query_info (file, NEMO_METADATA_NEMO_SORT_ORDER, G_FILE_QUERY_INFO_NONE, NULL, &error);
+    if (error != NULL)
+    {
+        fprintf (stderr, "GFileInfo Error: %s", error->message);
+        g_assert (FALSE);
+    }
+
+    return ginfo;
+}
+
+static char *
+get_currently_applied_sort_order (GFileInfo *ginfo)
+{
+    char *sort_order_string;
+
+    sort_order_string = g_file_info_get_attribute_string (ginfo, NEMO_METADATA_NEMO_SORT_ORDER);
+    return sort_order_string;
+}
 
 static void
 button_apply_clicked_cb (GtkButton *button, gpointer data)
 {
     SpectrumWindow *window;
     char *sort_order_string;
-    
+
     window = data;
     sort_order_string = gtk_entry_get_text (GTK_ENTRY (window->entry_sort_order));
-    nemo_file_info_add_string_attribute (window->info, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
+    g_file_info_set_attribute_string (window->ginfo, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
+    // TODO may need to force a reload?
 }
 
 static SpectrumWindow *
@@ -72,7 +100,7 @@ create_window (NemoFileInfo *info)
     GError *error;
 
     window = g_new0 (SpectrumWindow, 1);
-    window->info = info;
+    window->ginfo = get_gfileinfo_from_nemofileinfo (info);
     window->xml = gtk_builder_new ();
     gtk_builder_set_translation_domain (window->xml, "nemo-extensions");
 
@@ -80,12 +108,12 @@ create_window (NemoFileInfo *info)
     gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error);
     if (error != NULL)
     {
-        fprintf (stderr, "Error: %s", error->message);
+        fprintf (stderr, "GtkBuilder Error: %s", error->message);
         g_assert (FALSE);
     }
     window->root = GTK_WIDGET (gtk_builder_get_object (window->xml, "root"));
 
-    sort_order_string = nemo_file_info_get_string_attribute (info, NEMO_METADATA_NEMO_SORT_ORDER);
+    sort_order_string = get_currently_applied_sort_order (window->ginfo);
     window->entry_sort_order = GTK_WIDGET (gtk_builder_get_object (window->xml, "entry_sort_order"));
     gtk_entry_set_text (GTK_ENTRY (window->entry_sort_order), sort_order_string);
 
