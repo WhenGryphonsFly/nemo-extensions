@@ -37,6 +37,7 @@
 //====================================================================================================================//
 
 typedef struct {
+    GFile *file;
     GFileInfo *ginfo;
     GtkBuilder *xml;
     GtkWidget *root;
@@ -52,29 +53,25 @@ typedef struct {
 //====================================================================================================================//
 #define NEMO_METADATA_NEMO_SORT_ORDER "metadata::nemo-sort-order"
 
-static GFileInfo *
-get_gfileinfo_from_nemofileinfo (NemoFileInfo *info)
+static void
+get_gfile_and_gfileinfo_from_nemofileinfo (NemoFileInfo *info, GFile **file, GFileInfo **ginfo)
 {
-    GFile *file
-    GFileInfo *ginfo;
     GError *error;
 
     error = NULL;
-    file = nemo_file_info_get_location (info);
-    ginfo = g_file_query_info (file, NEMO_METADATA_NEMO_SORT_ORDER, G_FILE_QUERY_INFO_NONE, NULL, &error);
+    *file = nemo_file_info_get_location (info);
+    *ginfo = g_file_query_info (*file, NEMO_METADATA_NEMO_SORT_ORDER, G_FILE_QUERY_INFO_NONE, NULL, &error);
     if (error != NULL)
     {
-        fprintf (stderr, "GFileInfo Error: %s", error->message);
+        fprintf (stderr, "GFileInfo Read Error: %s", error->message);
         g_assert (FALSE);
     }
-
-    return ginfo;
 }
 
-static char *
+static const char *
 get_currently_applied_sort_order (GFileInfo *ginfo)
 {
-    char *sort_order_string;
+    const char *sort_order_string;
 
     sort_order_string = g_file_info_get_attribute_string (ginfo, NEMO_METADATA_NEMO_SORT_ORDER);
     return sort_order_string;
@@ -84,11 +81,19 @@ static void
 button_apply_clicked_cb (GtkButton *button, gpointer data)
 {
     SpectrumWindow *window;
-    char *sort_order_string;
+    const char *sort_order_string;
+    GError *error;
 
     window = data;
     sort_order_string = gtk_entry_get_text (GTK_ENTRY (window->entry_sort_order));
+
     g_file_info_set_attribute_string (window->ginfo, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
+    set_attributes_from_info(window->file, window->ginfo, G_FILE_QUERY_INFO_NONE, NULL, &error);
+    if (error != NULL)
+    {
+        fprintf (stderr, "GFileInfo Write Error: %s", error->message);
+        g_assert (FALSE);
+    }
     // TODO may need to force a reload?
 }
 
@@ -96,11 +101,11 @@ static SpectrumWindow *
 create_window (NemoFileInfo *info)
 {
     SpectrumWindow *window;
-    char *sort_order_string;
+    const char *sort_order_string;
     GError *error;
 
     window = g_new0 (SpectrumWindow, 1);
-    window->ginfo = get_gfileinfo_from_nemofileinfo (info);
+    get_gfile_and_gfileinfo_from_nemofileinfo (info, &window->file, &window->ginfo);
     window->xml = gtk_builder_new ();
     gtk_builder_set_translation_domain (window->xml, "nemo-extensions");
 
