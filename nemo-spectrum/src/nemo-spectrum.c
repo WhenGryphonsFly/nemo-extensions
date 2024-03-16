@@ -37,6 +37,7 @@
 //====================================================================================================================//
 
 typedef struct {
+    NemoFileInfo *info;
     GtkBuilder *xml;
     GtkWidget *root;
 
@@ -52,6 +53,17 @@ typedef struct {
 
 #define NEMO_METADATA_NEMO_SORT_ORDER "nemo-sort-order"
 
+static void
+button_apply_clicked_cb (GtkButton *button, gpointer data)
+{
+    SpectrumWindow *window;
+    char *sort_order_string;
+    
+    window = data;
+    sort_order_string = gtk_entry_get_text (GTK_ENTRY (window->entry_sort_order));
+    nemo_file_info_add_string_attribute (window->info, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
+}
+
 static SpectrumWindow *
 create_window (NemoFileInfo *info)
 {
@@ -60,6 +72,7 @@ create_window (NemoFileInfo *info)
     GError *error;
 
     window = g_new0 (SpectrumWindow, 1);
+    window->info = info;
     window->xml = gtk_builder_new ();
     gtk_builder_set_translation_domain (window->xml, "nemo-extensions");
 
@@ -67,8 +80,8 @@ create_window (NemoFileInfo *info)
     gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error);
     if (error != NULL)
     {
-    	fprintf (stderr, "Error: %s", error->message);
-    	g_assert (FALSE);
+        fprintf (stderr, "Error: %s", error->message);
+        g_assert (FALSE);
     }
     window->root = GTK_WIDGET (gtk_builder_get_object (window->xml, "root"));
 
@@ -78,6 +91,7 @@ create_window (NemoFileInfo *info)
 
     window->button_cancel = GTK_WIDGET (gtk_builder_get_object (window->xml, "button_cancel"));
     window->button_apply = GTK_WIDGET (gtk_builder_get_object (window->xml, "button_apply"));
+    g_signal_connect (window->button_apply, "clicked", G_CALLBACK (button_apply_clicked_cb), window);
     window->button_information = GTK_WIDGET (gtk_builder_get_object (window->xml, "button_information"));
 
     return window;
