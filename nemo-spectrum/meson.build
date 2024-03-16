@@ -1,0 +1,45 @@
+project('nemo-spectrum',
+    'c',
+    version: '0.0.1',
+    meson_version: '>=0.56.0'
+)
+
+project_url = 'https://github.com/linuxmint/nemo-extensions'
+
+
+gnome     = import('gnome')
+pkgconfig = import('pkgconfig')
+
+config = configuration_data()
+
+################################################################################
+# Find libnemo-extensions
+
+libnemo = dependency('libnemo-extension', version: '>=2.0.0')
+libnemo_extension_dir = libnemo.get_variable(pkgconfig: 'extensiondir')
+libnemo_extension_ver = libnemo.version().split('.')
+
+config.set('NEMO_VERSION_MAJOR', libnemo_extension_ver[0])
+config.set('NEMO_VERSION_MINOR', libnemo_extension_ver[1])
+config.set('NEMO_VERSION_MICRO', libnemo_extension_ver[2])
+
+glib = dependency('glib-2.0', version: '>=2.14.0')
+
+################################################################################
+# Extension dependencies
+
+interfaces_dir = get_option('datadir') / meson.project_name() / 'ui'
+config.set_quoted('INTERFACES_DIR', get_option('prefix') / interfaces_dir)
+
+################################################################################
+# Extension-specific (other than dependencies)
+
+add_project_arguments('-DHAVE_CONFIG_H', language: 'c')
+configure_file(
+    output: 'config.h',
+    configuration: config,
+)
+
+rootInclude = include_directories('.')
+
+subdir('src')

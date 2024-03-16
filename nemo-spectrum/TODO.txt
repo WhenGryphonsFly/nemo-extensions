@@ -1,0 +1,9 @@
+=======================================
+* General
+	* nemo-extension-types.h
+	* nemo-info-provider.h
+	* nemo-name-and-desc-provider.h
+* Specialized
+	* nemo-column-provider.h
+	* nemo-menu-provider.h
+	* nemo-property-page-provider.h

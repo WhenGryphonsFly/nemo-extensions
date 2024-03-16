@@ -1,0 +1,17 @@
+Source: nemo-spectrum
+Section: gnome
+Priority: optional
+Maintainer: WhenGryphonsFly <84215159+WhenGryphonsFly@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 12),
+               meson,
+               libglib2.0-dev (>= 2.35.9),
+               libnemo-extension-dev
+Standards-Version: 3.9.6
+
+Package: nemo-spectrum
+Architecture: any
+Depends: nemo,
+         ${shlibs:Depends}, ${misc:Depends},
+Enhances: nemo
+Description: TODO_SHORT_DESCRIPTION
+ TODO_LONG_DESCRIPTION

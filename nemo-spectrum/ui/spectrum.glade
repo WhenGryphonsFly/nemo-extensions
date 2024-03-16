@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.16"/>
+  <object class="GtkBox" id="root">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="border-width">12</property>
+    <property name="orientation">vertical</property>
+    <property name="spacing">12</property>
+    <child>
+      <!-- n-columns=2 n-rows=3 -->
+      <object class="GtkGrid" id="grid1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="row-spacing">6</property>
+        <property name="column-spacing">12</property>
+        <child>
+          <object class="GtkLabel" id="label_sort_order">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Sort order:</property>
+            <property name="use-underline">True</property>
+            <property name="mnemonic-widget">entry_sort_order</property>
+            <property name="xalign">0</property>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="entry_sort_order">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="hexpand">True</property>
+          </object>
+          <packing>
+            <property name="left-attach">1</property>
+            <property name="top-attach">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label_note_integer">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Sort order accepts signed decimal or hexadecimal integers. (Hexadecimal integers must be prefixed with "0x" or "-0x".)</property>
+            <property name="wrap">True</property>
+            <property name="xalign">0</property>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">1</property>
+            <property name="width">2</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkButtonBox" id="buttonbox1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="spacing">5</property>
+        <property name="layout-style">end</property>
+        <child>
+          <object class="GtkButton" id="button_cancel">
+            <property name="label">gtk-cancel</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="can-default">True</property>
+            <property name="receives-default">True</property>
+            <property name="use-stock">True</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button_apply">
+            <property name="label">gtk-apply</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="use-stock">True</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkInfoBar" id="infobar1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="infobar_buttonbox">
+            <property name="can-focus">False</property>
+            <property name="spacing">6</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="button_information">
+                <property name="label">gtk-info</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="use-stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child internal-child="content_area">
+          <object class="GtkBox" id="infobar_box">
+            <property name="can-focus">False</property>
+            <property name="spacing">16</property>
+            <child>
+              <object class="GtkLabel" id="label_warning">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Files are listed in sort order, low to high. For more information, including exceptions to this rule, click "Information".</property>
+                <property name="wrap">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+  </object>
+</interface>
