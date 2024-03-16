@@ -7,3 +7,10 @@
 	* nemo-column-provider.h
 	* nemo-menu-provider.h
 	* nemo-property-page-provider.h
+
+GFileInfo Read Error: Error when getting information for file “/home/whengryphonsfly/Sandbox/nemo/nemo-build-deps_6.0.3~spectrumtest6_amd64.buildinfo.new”: No such file or directory
+**
+ERROR:../src/nemo-spectrum.c:67:get_gfile_and_gfileinfo_from_nemofileinfo: assertion failed: (FALSE)
+Bail out! ERROR:../src/nemo-spectrum.c:67:get_gfile_and_gfileinfo_from_nemofileinfo: assertion failed: (FALSE)
+Aborted (core dumped)
+
