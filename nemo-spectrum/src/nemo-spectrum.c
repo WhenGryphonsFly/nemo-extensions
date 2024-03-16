@@ -63,7 +63,7 @@ get_gfile_and_gfileinfo_from_nemofileinfo (NemoFileInfo *info, GFile **file, GFi
     *ginfo = g_file_query_info (*file, NEMO_METADATA_NEMO_SORT_ORDER, G_FILE_QUERY_INFO_NONE, NULL, &error);
     if (error != NULL)
     {
-        fprintf (stderr, "GFileInfo Read Error: %s", error->message);
+        fprintf (stderr, "GFileInfo Read Error: %s\n", error->message);
         g_assert (FALSE);
     }
 }
@@ -87,11 +87,12 @@ button_apply_clicked_cb (GtkButton *button, gpointer data)
     window = data;
     sort_order_string = gtk_entry_get_text (GTK_ENTRY (window->entry_sort_order));
 
+    error = NULL;
     g_file_info_set_attribute_string (window->ginfo, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
-    set_attributes_from_info(window->file, window->ginfo, G_FILE_QUERY_INFO_NONE, NULL, &error);
+    g_file_set_attributes_from_info(window->file, window->ginfo, G_FILE_QUERY_INFO_NONE, NULL, &error);
     if (error != NULL)
     {
-        fprintf (stderr, "GFileInfo Write Error: %s", error->message);
+        fprintf (stderr, "GFileInfo Write Error: %s\n", error->message);
         g_assert (FALSE);
     }
     // TODO may need to force a reload?
@@ -113,7 +114,7 @@ create_window (NemoFileInfo *info)
     gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error);
     if (error != NULL)
     {
-        fprintf (stderr, "GtkBuilder Error: %s", error->message);
+        fprintf (stderr, "GtkBuilder Error: %s\n", error->message);
         g_assert (FALSE);
     }
     window->root = GTK_WIDGET (gtk_builder_get_object (window->xml, "root"));
