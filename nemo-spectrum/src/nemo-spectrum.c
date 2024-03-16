@@ -64,11 +64,11 @@ create_window (NemoFileInfo *info)
     gtk_builder_set_translation_domain (window->xml, "nemo-extensions");
 
     error = NULL;
-    gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error)
+    gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error);
     if (error != NULL)
     {
     	fprintf (stderr, "Error: %s", error->message);
-    	g_assert (false);
+    	g_assert (FALSE);
     }
     window->root = GTK_WIDGET (gtk_builder_get_object (window->xml, "root"));
 

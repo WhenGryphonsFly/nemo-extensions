@@ -42,4 +42,5 @@ configure_file(
 
 rootInclude = include_directories('.')
 
+subdir('ui')
 subdir('src')
