@@ -153,7 +153,7 @@ nemo_spectrum_info_update_file_info(NemoInfoProvider     *provider,
     
     get_gfile_and_gfileinfo_from_nemofileinfo (file, &gfile, &ginfo);
     sort_order_string = get_currently_applied_sort_order (ginfo);
-    nemo_file_info_add_string_attribute (file, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
+    nemo_file_info_add_string_attribute (file, "NemoSpectrum::sort_order_column", sort_order_string);
     return NEMO_OPERATION_COMPLETE;
 }
 
