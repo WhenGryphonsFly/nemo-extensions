@@ -153,7 +153,7 @@ nemo_spectrum_info_update_file_info (NemoInfoProvider     *provider,
     get_gfile_and_gfileinfo_from_nemofileinfo (file, &gfile, &ginfo);
     sort_order_string = get_currently_applied_sort_order (ginfo);
     /*
-     * FIXME in nemo
+     * TODO FIXME in nemo
      * In List View, the column uses the attribute (NEMO_METADATA_NEMO_SORT_ORDER) as its quark (correct)
      * In Icon iew, the detail uses the name ("NemoSpectrum::sort_order_column") as its quark (incorrect)
      */
