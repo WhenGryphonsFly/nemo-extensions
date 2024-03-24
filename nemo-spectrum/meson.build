@@ -34,6 +34,10 @@ config.set_quoted('INTERFACES_DIR', get_option('prefix') / interfaces_dir)
 ################################################################################
 # Extension-specific (other than dependencies)
 
+gettext_package = 'nemo-extensions'
+config.set_quoted('GETTEXT_PACKAGE', gettext_package)
+config.set_quoted('NEMO_SHARE_LOCALEDIR', get_option('prefix') / get_option('localedir'))
+
 add_project_arguments('-DHAVE_CONFIG_H', language: 'c')
 configure_file(
     output: 'config.h',

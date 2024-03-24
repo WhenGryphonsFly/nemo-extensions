@@ -30,6 +30,7 @@
 
 #include "nemo-spectrum.h"
 #include <gtk/gtk.h>
+#include <glib/gi18n-lib.h>
 #include <libnemo-extension/nemo-file-info.h>
 
 //====================================================================================================================//
@@ -203,7 +204,7 @@ nemo_spectrum_column_get_columns (NemoColumnProvider* provider)
     NemoColumn *column = nemo_column_new (
         "NemoSpectrum::sort_order_column",
         NEMO_METADATA_NEMO_SORT_ORDER,
-        "Sort Order", // TODO _()
+        _("Sort Order"),
         ""
     );
 
@@ -260,7 +261,7 @@ nemo_spectrum_property_page_get_pages (NemoPropertyPageProvider *provider,
     pages = NULL;
     page = nemo_property_page_new(
         "NemoSpectrum::property_page",
-        gtk_label_new("Sort Order"), // TODO _()
+        gtk_label_new (_("Sort Order")),
         window->root
     );
     pages = g_list_append(pages, page);
@@ -302,7 +303,8 @@ nemo_spectrum_name_and_desc_get_name_and_desc (NemoNameAndDescProvider *provider
     GList* ret = NULL;
     gchar* string = g_strdup_printf (
         "nemo-spectrum:::%s",
-        "TODO_DESCRIPTION"); // TODO _()
+        _("TODO_DESCRIPTION")
+    );
 
     ret = g_list_append(ret, string);
     return ret;
@@ -388,7 +390,8 @@ nemo_spectrum_register_type (GTypeModule* module)
 void
 nemo_module_initialize (GTypeModule *module)
 {
-    // TODO _() related stuff
+    bindtextdomain ("nemo-extensions", NEMO_SHARE_LOCALEDIR);
+    bind_textdomain_codeset ("nemo-extensions", "UTF-8");
 
     nemo_spectrum_register_type (module);
 }
