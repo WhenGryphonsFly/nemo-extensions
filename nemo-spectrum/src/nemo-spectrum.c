@@ -54,17 +54,18 @@ typedef struct {
 #define NEMO_METADATA_NEMO_SORT_ORDER "metadata::nemo-sort-order"
 
 static void
-get_gfile_and_gfileinfo_from_nemofileinfo (NemoFileInfo *info, GFile **file, GFileInfo **ginfo)
+get_gfile_and_gfileinfo_from_nemofileinfo (NemoFileInfo  *info,
+                                           GFile        **file,
+                                           GFileInfo    **ginfo)
 {
     GError *error;
 
     error = NULL;
     *file = nemo_file_info_get_location (info);
     *ginfo = g_file_query_info (*file, NEMO_METADATA_NEMO_SORT_ORDER, G_FILE_QUERY_INFO_NONE, NULL, &error);
-    if (error != NULL)
-    {
-        fprintf (stderr, "GFileInfo Read Error: %s\n", error->message);
-        g_assert (FALSE);
+    if (error != NULL) {
+        fprintf (stderr, "nemo-spectrum: GFileInfo Read Error: %s\n", error->message); // TODO check _()
+        //g_assert (FALSE);
     }
 }
 
@@ -74,15 +75,15 @@ get_currently_applied_sort_order (GFileInfo *ginfo)
     const char *sort_order_string;
 
     sort_order_string = g_file_info_get_attribute_string (ginfo, NEMO_METADATA_NEMO_SORT_ORDER);
-    if (sort_order_string == NULL)
-    {
+    if (sort_order_string == NULL) {
         sort_order_string = "";
     }
     return sort_order_string;
 }
 
 static void
-button_apply_clicked_cb (GtkButton *button, gpointer data)
+button_apply_clicked_cb (GtkButton *button,
+                         gpointer   data)
 {
     SpectrumWindow *window;
     const char *sort_order_string;
@@ -93,10 +94,9 @@ button_apply_clicked_cb (GtkButton *button, gpointer data)
 
     error = NULL;
     g_file_info_set_attribute_string (window->ginfo, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
-    g_file_set_attributes_from_info(window->file, window->ginfo, G_FILE_QUERY_INFO_NONE, NULL, &error);
-    if (error != NULL)
-    {
-        fprintf (stderr, "GFileInfo Write Error: %s\n", error->message);
+    g_file_set_attributes_from_info (window->file, window->ginfo, G_FILE_QUERY_INFO_NONE, NULL, &error);
+    if (error != NULL) {
+        fprintf (stderr, "nemo-spectrum: GFileInfo Write Error: %s\n", error->message);
         g_assert (FALSE);
     }
     // TODO may need to force a reload?
@@ -116,9 +116,8 @@ create_window (NemoFileInfo *info)
 
     error = NULL;
     gtk_builder_add_from_file (window->xml, INTERFACES_DIR"/spectrum.glade", &error);
-    if (error != NULL)
-    {
-        fprintf (stderr, "GtkBuilder Error: %s\n", error->message);
+    if (error != NULL) {
+        fprintf (stderr, "nemo-spectrum: GtkBuilder Error: %s\n", error->message);
         g_assert (FALSE);
     }
     window->root = GTK_WIDGET (gtk_builder_get_object (window->xml, "root"));
@@ -141,41 +140,50 @@ create_window (NemoFileInfo *info)
 #include <libnemo-extension/nemo-info-provider.h>
 
 static NemoOperationResult
-nemo_spectrum_info_update_file_info(NemoInfoProvider     *provider, 
-                                    NemoFileInfo         *file,
-                                    GClosure             *update_complete,
-                                    NemoOperationHandle **handle)
+nemo_spectrum_info_update_file_info (NemoInfoProvider     *provider,
+                                     NemoFileInfo         *file,
+                                     GClosure             *update_complete,
+                                     NemoOperationHandle **handle)
 {
     // Not useful for property-page-provider.h or menu-provider.h, but crucial for column-provider.h
     GFile *gfile;
     GFileInfo *ginfo;
     const char *sort_order_string;
-    
+
     get_gfile_and_gfileinfo_from_nemofileinfo (file, &gfile, &ginfo);
     sort_order_string = get_currently_applied_sort_order (ginfo);
+    /*
+     * FIXME in nemo
+     * In List View, the column uses the attribute (NEMO_METADATA_NEMO_SORT_ORDER) as its quark (correct)
+     * In Icon iew, the detail uses the name ("NemoSpectrum::sort_order_column") as its quark (incorrect)
+     */
+    nemo_file_info_add_string_attribute (file, NEMO_METADATA_NEMO_SORT_ORDER, sort_order_string);
     nemo_file_info_add_string_attribute (file, "NemoSpectrum::sort_order_column", sort_order_string);
     return NEMO_OPERATION_COMPLETE;
 }
 
 static void
-nemo_spectrum_info_cancel_update(NemoInfoProvider    *provider,
-                                 NemoOperationHandle *handle)
+nemo_spectrum_info_cancel_update (NemoInfoProvider    *provider,
+                                  NemoOperationHandle *handle)
 {
     // No async operations, so nothing to do
 }
 
-static void nemo_spectrum_info_provider_iface_init(NemoInfoProviderIface *iface) {
+static void nemo_spectrum_info_provider_iface_init (NemoInfoProviderIface *iface)
+{
     iface->update_file_info = nemo_spectrum_info_update_file_info;
     iface->cancel_update = nemo_spectrum_info_cancel_update;
 }
 
-static void nemo_spectrum_info_init_hook(GTypeModule* module, GType spectrum_type) {
+static void nemo_spectrum_info_init_hook (GTypeModule *module,
+                                          GType        spectrum_type)
+{
     static const GInterfaceInfo info_provider_iface_info = {
         (GInterfaceInitFunc) nemo_spectrum_info_provider_iface_init,
         NULL,
         NULL
     };
-    g_type_module_add_interface(
+    g_type_module_add_interface (
         module,
         spectrum_type,
         NEMO_TYPE_INFO_PROVIDER,
@@ -188,7 +196,9 @@ static void nemo_spectrum_info_init_hook(GTypeModule* module, GType spectrum_typ
 //====================================================================================================================//
 #include <libnemo-extension/nemo-column-provider.h>
 
-static GList* nemo_spectrum_column_get_columns(NemoColumnProvider* provider) {
+static GList *
+nemo_spectrum_column_get_columns (NemoColumnProvider* provider)
+{
     GList* ret = NULL;
     NemoColumn *column = nemo_column_new (
         "NemoSpectrum::sort_order_column",
@@ -197,21 +207,26 @@ static GList* nemo_spectrum_column_get_columns(NemoColumnProvider* provider) {
         ""
     );
 
-    ret = g_list_append(ret, column);
+    ret = g_list_append (ret, column);
     return ret;
 }
 
-static void nemo_spectrum_column_provider_iface_init(NemoColumnProviderIface *iface) {
+static void
+nemo_spectrum_column_provider_iface_init (NemoColumnProviderIface *iface)
+{
     iface->get_columns = nemo_spectrum_column_get_columns;
 }
 
-static void nemo_spectrum_column_init_hook(GTypeModule* module, GType spectrum_type) {
+static void
+nemo_spectrum_column_init_hook (GTypeModule *module,
+                                GType        spectrum_type)
+{
     static const GInterfaceInfo column_provider_iface_info = {
         (GInterfaceInitFunc) nemo_spectrum_column_provider_iface_init,
         NULL,
         NULL
     };
-    g_type_module_add_interface(
+    g_type_module_add_interface (
         module,
         spectrum_type,
         NEMO_TYPE_COLUMN_PROVIDER,
@@ -224,7 +239,10 @@ static void nemo_spectrum_column_init_hook(GTypeModule* module, GType spectrum_t
 //====================================================================================================================//
 #include <libnemo-extension/nemo-property-page-provider.h>
 
-static GList* nemo_spectrum_property_page_get_pages(NemoPropertyPageProvider* provider, GList* files) {
+static GList *
+nemo_spectrum_property_page_get_pages (NemoPropertyPageProvider *provider,
+                                       GList                    *files)
+{
     NemoFileInfo *fileinfo;
     SpectrumWindow *window;
     GList *pages;
@@ -250,11 +268,16 @@ static GList* nemo_spectrum_property_page_get_pages(NemoPropertyPageProvider* pr
     return pages;
 }
 
-static void nemo_spectrum_property_page_provider_iface_init(NemoPropertyPageProviderIface *iface) {
+static void
+nemo_spectrum_property_page_provider_iface_init (NemoPropertyPageProviderIface *iface)
+{
     iface->get_pages = nemo_spectrum_property_page_get_pages;
 }
 
-static void nemo_spectrum_property_page_init_hook(GTypeModule* module, GType spectrum_type) {
+static void
+nemo_spectrum_property_page_init_hook (GTypeModule *module,
+                                       GType        spectrum_type)
+{
     static const GInterfaceInfo property_page_provider_iface_info = {
         (GInterfaceInitFunc) nemo_spectrum_property_page_provider_iface_init,
         NULL,
@@ -273,7 +296,9 @@ static void nemo_spectrum_property_page_init_hook(GTypeModule* module, GType spe
 //====================================================================================================================//
 #include <libnemo-extension/nemo-name-and-desc-provider.h>
 
-static GList* nemo_spectrum_name_and_desc_get_name_and_desc(NemoNameAndDescProvider* provider) {
+static GList *
+nemo_spectrum_name_and_desc_get_name_and_desc (NemoNameAndDescProvider *provider)
+{
     GList* ret = NULL;
     gchar* string = g_strdup_printf (
         "nemo-spectrum:::%s",
@@ -283,11 +308,16 @@ static GList* nemo_spectrum_name_and_desc_get_name_and_desc(NemoNameAndDescProvi
     return ret;
 }
 
-static void nemo_spectrum_name_and_desc_provider_iface_init(NemoNameAndDescProviderIface *iface) {
+static void
+nemo_spectrum_name_and_desc_provider_iface_init (NemoNameAndDescProviderIface *iface)
+{
     iface->get_name_and_desc = nemo_spectrum_name_and_desc_get_name_and_desc;
 }
 
-static void nemo_spectrum_name_and_desc_init_hook(GTypeModule* module, GType spectrum_type) {
+static void
+nemo_spectrum_name_and_desc_init_hook (GTypeModule *module,
+                                       GType        spectrum_type)
+{
     static const GInterfaceInfo name_and_desc_provider_iface_info = {
         (GInterfaceInitFunc) nemo_spectrum_name_and_desc_provider_iface_init,
         NULL,
@@ -306,19 +336,28 @@ static void nemo_spectrum_name_and_desc_init_hook(GTypeModule* module, GType spe
 //====================================================================================================================//
 #include <libnemo-extension/nemo-extension-types.h>
 
-static GType spectrum_type = 0;
-static GType nemo_spectrum_get_type(void) {
+static GType spectrum_type = 0; // TODO style
+
+static GType
+nemo_spectrum_get_type (void)
+{
     return spectrum_type;
 }
 
-static void nemo_spectrum_class_init(NemoSpectrumClass* class) {
+static void
+nemo_spectrum_class_init (NemoSpectrumClass *class)
+{
     //parent_class = g_type_class_peek_parent(class);
 }
 
-static void nemo_spectrum_instance_init(NemoSpectrum* instance) {
+static void
+nemo_spectrum_instance_init (NemoSpectrum* instance)
+{
 }
 
-static void nemo_spectrum_register_type(GTypeModule* module) {
+static void
+nemo_spectrum_register_type (GTypeModule* module)
+{
     static const GTypeInfo info = {
         sizeof(NemoSpectrumClass),
         (GBaseInitFunc) NULL,
@@ -340,24 +379,30 @@ static void nemo_spectrum_register_type(GTypeModule* module) {
     );
 
     // Add init hooks here
-
-    nemo_spectrum_info_init_hook(module, spectrum_type);
-    nemo_spectrum_column_init_hook(module, spectrum_type);
-    nemo_spectrum_property_page_init_hook(module, spectrum_type);
-    nemo_spectrum_name_and_desc_init_hook(module, spectrum_type);
+    nemo_spectrum_info_init_hook          (module, spectrum_type);
+    nemo_spectrum_column_init_hook        (module, spectrum_type);
+    nemo_spectrum_property_page_init_hook (module, spectrum_type);
+    nemo_spectrum_name_and_desc_init_hook (module, spectrum_type);
 }
 
-void nemo_module_initialize(GTypeModule* module) {
+void
+nemo_module_initialize (GTypeModule *module)
+{
     // TODO
 
-    nemo_spectrum_register_type(module);
+    nemo_spectrum_register_type (module);
 }
 
-void nemo_module_shutdown(void) {
+void
+nemo_module_shutdown (void)
+{
     // TODO
 }
 
-void nemo_module_list_types(const GType** types, int* num_types) {
+void
+nemo_module_list_types (const GType **types,
+                        int          *num_types)
+{
     static GType type_list[1];
     type_list[0] = NEMO_TYPE_SPECTRUM;
     *types = type_list;
