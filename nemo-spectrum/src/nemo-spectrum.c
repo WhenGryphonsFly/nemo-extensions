@@ -64,7 +64,7 @@ get_gfile_and_gfileinfo_from_nemofileinfo (NemoFileInfo  *info,
     *file = nemo_file_info_get_location (info);
     *ginfo = g_file_query_info (*file, NEMO_METADATA_NEMO_SORT_ORDER, G_FILE_QUERY_INFO_NONE, NULL, &error);
     if (error != NULL) {
-        fprintf (stderr, "nemo-spectrum: GFileInfo Read Error: %s\n", error->message); // TODO check _()
+        fprintf (stderr, "nemo-spectrum: GFileInfo Read Error: %s\n", error->message);
         //g_assert (FALSE);
     }
 }
@@ -336,7 +336,7 @@ nemo_spectrum_name_and_desc_init_hook (GTypeModule *module,
 //====================================================================================================================//
 #include <libnemo-extension/nemo-extension-types.h>
 
-static GType spectrum_type = 0; // TODO style
+static GType spectrum_type = 0;
 
 static GType
 nemo_spectrum_get_type (void)
@@ -388,7 +388,7 @@ nemo_spectrum_register_type (GTypeModule* module)
 void
 nemo_module_initialize (GTypeModule *module)
 {
-    // TODO
+    // TODO _() related stuff
 
     nemo_spectrum_register_type (module);
 }
@@ -396,7 +396,7 @@ nemo_module_initialize (GTypeModule *module)
 void
 nemo_module_shutdown (void)
 {
-    // TODO
+    // TODO is there anything to free?
 }
 
 void
