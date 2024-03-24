@@ -146,7 +146,7 @@ nemo_spectrum_info_update_file_info (NemoInfoProvider     *provider,
                                      GClosure             *update_complete,
                                      NemoOperationHandle **handle)
 {
-    // Not useful for property-page-provider.h or menu-provider.h, but crucial for column-provider.h
+    // Not useful for property-page-provider.h, but crucial for column-provider.h
     GFile *gfile;
     GFileInfo *ginfo;
     const char *sort_order_string;
@@ -264,7 +264,7 @@ nemo_spectrum_property_page_get_pages (NemoPropertyPageProvider *provider,
         gtk_label_new (_("Sort Order")),
         window->root
     );
-    pages = g_list_append(pages, page);
+    pages = g_list_append (pages, page);
 
     return pages;
 }
@@ -347,29 +347,18 @@ nemo_spectrum_get_type (void)
 }
 
 static void
-nemo_spectrum_class_init (NemoSpectrumClass *class)
-{
-    //parent_class = g_type_class_peek_parent(class);
-}
-
-static void
-nemo_spectrum_instance_init (NemoSpectrum* instance)
-{
-}
-
-static void
 nemo_spectrum_register_type (GTypeModule* module)
 {
     static const GTypeInfo info = {
         sizeof(NemoSpectrumClass),
         (GBaseInitFunc) NULL,
         (GBaseFinalizeFunc) NULL,
-        (GClassInitFunc) nemo_spectrum_class_init, // TODO
+        (GClassInitFunc) NULL,
         (GClassFinalizeFunc) NULL,
         NULL,
         sizeof(NemoSpectrum),
         0,
-        (GInstanceInitFunc) nemo_spectrum_instance_init, // TODO
+        (GInstanceInitFunc) NULL,
         // Empty valueTable
     };
     spectrum_type = g_type_module_register_type(
